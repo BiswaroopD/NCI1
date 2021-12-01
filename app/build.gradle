@@ -1,46 +1,170 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
+//    buildToolsVersion('27.0.3') // added
+
+////    added - start
+//    def versionPropertiesFile = file('version.properties')
+//    def value = 0
+//
+//    Properties versionProperties = new Properties()
+//    if(!versionPropertiesFile.exists()) {
+//        versionProperties['VERSION_PATCH'] = "0"
+//        versionProperties['VERSION_NUMBER'] = "0"
+//        versionProperties['VERSION_BUILD'] = "-1"
+//        versionProperties.store(versionPropertiesFile.newWriter(),null)
+//    }
+//
+//    def runTasks = gradle.startParameter.taskNames
+//    if('assemble' in runTasks || 'assembleRelease' in runTasks || 'debug' in runTasks) {
+//        value = 1
+//    }
+//
+//    def appVersionName = ""
+//    def appFileName = ""
+//
+//    if(versionPropertiesFile.canRead()) {
+//        versionProperties.load(new FileInputStream(versionPropertiesFile))
+//
+//        def versionMajor = 1
+//        def versionMinor = 0
+//        def versionPatch = versionProperties['VERSION_PATCH'].toInteger() + value
+//        def versionNumber = versionProperties['VERSION_NUMBER'].toInteger() + value
+//        def versionBuild = versionProperties['VERSION_BUILD'].toInteger() + 1
+//
+//        versionProperties.store(versionPropertiesFile.newWriter(), null)
+//
+//        appVersionName = "${versionMajor}.${versionMinor}.${versionPatch} (${versionBuild})"
+//
+//        appFileName = "SimpleNewsChattr-${appVersionName}.apk"
+//
+////    added - end
+
     defaultConfig {
-        applicationId "com.example.biswaroop.nci"
-        minSdkVersion 15
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId "com.theappfactory.ChattrBox.SimpleNewsChat"
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 44
+        versionName "1.0.3"
+////        added - start
+//            versionCode versionNumber
+//            versionName appVersionName
+////        added - end
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
+////    added-start
+//        def fileNaming = "apk/RELEASES"
+//
+//        applicationVariants.all { variant ->
+//            variant.outputs.each { output ->
+//                def outputFile = output.outputFile
+////                variant.outputs.each { output ->
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        outputFile = new File(getProject().getRootDir(), "${fileNaming}-${versionMajor}.${versionMinor}.${versionPatch}-${outputFile.name}")
+//                    }
+////                }
+//            }
+//        }
+//    }
+//    else {
+//        throw new GradleException("Could not read version.Properties!")
+//    }
+////    added - end
+
+////    added - start
+//
+//    task copyApkFiles(type: Copy){
+//        from 'build/outputs/apk/release'
+//        into '../apk'
+//        include appFileName
+//    }
+//
+//    afterEvaluate {
+////        assembleRelease.doLast {
+//            tasks.copyApkFiles.execute()
+////        }
+//    }
+////    added - end
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.4'
+    implementation 'com.google.firebase:firebase-analytics:20.0.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
     def room_version = "1.1.1"
     def lifecycle_version = "1.1.1"
-    implementation "android.arch.persistence.room:runtime:$room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    implementation 'androidx.room:room-runtime:2.3.0'
 
-    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+    // Firebase in-app messaging(beta)
+    implementation 'com.google.android.gms:play-services-measurement-base:20.0.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:20.1.1'
+
+    //Firebase
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.0'
+    implementation 'com.google.firebase:firebase-database:20.0.2'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    implementation 'com.google.firebase:firebase-core:20.0.0'
+//    implementation 'com.google.firebase:firebase-messaging:23.0.0'
+    implementation 'com.google.firebase:firebase-messaging:23.0.0'
+    implementation 'com.google.firebase:firebase-storage:20.0.0'
+    implementation 'com.google.firebase:firebase-config:21.0.1'
+    implementation 'com.google.firebase:firebase-crash:16.2.1'
+    implementation 'com.google.firebase:firebase-appindexing:20.0.0'
+    implementation 'com.google.firebase:firebase-invites:17.0.0'
+    implementation 'com.google.firebase:firebase-ads:20.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.3.0'
+
+    // Firebase UI
+    implementation 'com.firebaseui:firebase-ui-database:8.0.0'
+//    implementation 'com.firebaseui:firebase-ui-database:4.1.0'
+
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.3'
+    implementation 'com.google.android.material:material:1.4.0'
+//    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+//    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation 'com.android.support:recyclerview-v7:28.0.0-alpha3'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+
+//    implementation 'de.hdodenhof:circleimageview:2.2.0'
 
     //networking
-//    implementation "com.squareup.retrofit2:retrofit:$project.retrofit"
-//    implementation "com.squareup.retrofit2:converter-gson:$project.retrofit"
     implementation "com.squareup.retrofit2:retrofit:2.4.0"
     implementation "com.squareup.retrofit2:converter-gson:2.4.0"
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    implementation 'com.google.android.gms:play-services-ads:20.5.0'
+//    implementation 'com.google.android.gms:16.0.1'
+
+//    implementation 'com.google.android.exoplayer:exoplayer:2.8.2'
+
+//    implementation('com.ts:auth-control-sdk:5.1.1@aar') { transitive=true }
 }
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+//com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

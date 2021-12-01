@@ -1,44 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/colorNewsRow">
 
-    <ImageView
-        android:id="@+id/ivNewsImage"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorPrimaryDark"/>
+        android:layout_weight="2">
+
+        <!--<com.google.android.exoplayer2.ui.PlayerView-->
+            <!--android:id="@+id/playerViewNewsVideo"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:background="@color/colorNewsRow">-->
+
+        <!--</com.google.android.exoplayer2.ui.PlayerView>-->
+
+        <ImageView
+            android:id="@+id/ivNewsImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:background="@color/colorNewsRow"/>
+
+        <ProgressBar
+            android:id="@+id/progressBarStoryImage"
+            android:layout_width="@dimen/progressbar_width_news"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_height="@dimen/progressbar_height_news" />
+
+        <TextView
+            android:id="@+id/tvLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading..."
+            android:layout_gravity="center_vertical|center_horizontal"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:maxLines="3"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_slab"
+        android:background="@color/colorNewsRow"
         android:ellipsize="end"
-        android:background="@color/colorPrimaryDark"
+        android:gravity="center_horizontal"
         android:hint="This is where the story title goes."
-        android:fontFamily="cursive"
-        android:textSize="32sp"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold|italic"
-        android:gravity="center_horizontal"/>
+        android:lines="2"
+        android:textColor="@color/colorTitleText"
+        android:textSize="@dimen/title_text_size"/>
 
     <TextView
         android:id="@+id/tvDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:background="@color/colorPrimaryDark"
-        android:textColor="@color/colorAccent"
-        android:hint="This is where the brief description of the story goes."
-        android:maxLines="3"
+        android:fontFamily="@font/habibi"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:background="@color/colorNewsRow"
         android:ellipsize="end"
-        android:textSize="16sp"
-        android:fontFamily="monospace"/>
+        android:hint="Click here for story."
+        android:maxLines="6"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/description_text_size"/>
 
+    <!--<LinearLayout-->
+        <!--android:id="@+id/layoutComment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="vertical">-->
+
+
+        <!--<TextView-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="end"-->
+            <!--android:layout_weight="1.5"-->
+            <!--android:text=""-->
+            <!--android:textAlignment="textEnd" />-->
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btnLike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/default_elevation"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/ic_send_white_24dp"
+                android:hint="Like"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabGotoArticleComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/default_elevation"
+                android:layout_gravity="start|top"
+                android:src="@drawable/ic_forum_white_48dp"
+                app:fabSize="mini"/>
+
+            <TextView
+                android:id="@+id/tvCommentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="@drawable/ic_chat_bubble_transparent_24dp"
+                android:text="22"
+                android:textAlignment="center"
+                android:textColor="@color/colorChatCountBubbleText"
+                android:textSize="@dimen/text_size_chat_count" />
+
+            <Button
+                android:id="@+id/btnShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/default_elevation"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/ic_send_white_24dp"
+                android:hint="Share"/>
+
+        </LinearLayout>
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="start"-->
+            <!--android:layout_weight="1"-->
+            <!--android:textAlignment="textStart"-->
+            <!--android:textColor="@color/colorAccent" />-->
+
+
+    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,38 +156,89 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorAccent"
-            android:hint="Source of the story"
-            android:textSize="6sp"
+            android:background="@color/colorNewsRow"
+            android:textColor="@color/colorText"
+            android:hint="Source"
+            android:textSize="@dimen/fine_text_size"
             android:maxLines="2"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:textAlignment="center"
+            android:layout_gravity="start" />
+
+        <TextView
+            android:id="@+id/tvLeftSeparator"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorSeparator"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"/>
 
         <TextView
             android:id="@+id/tvAuthor"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorAccent"
+            android:background="@color/colorNewsRow"
+            android:textColor="@color/colorText"
             android:hint="Author name"
-            android:textSize="6sp"
+            android:textSize="@dimen/fine_text_size"
             android:maxLines="2"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/tvRightSeparator"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorSeparator"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"/>
 
         <TextView
             android:id="@+id/tvPublishedAt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorAccent"
-            android:hint="Date and Time of publishing story."
-            android:textSize="6sp"
+            android:background="@color/colorNewsRow"
+            android:textColor="@color/colorText"
+            android:hint="Published datetime"
+            android:textSize="@dimen/fine_text_size"
             android:maxLines="2"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:textAlignment="center"
+            android:layout_gravity="start"/>
 
+        <TextView
+            android:id="@+id/tvArticleId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:visibility="gone"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvPoweredBy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Powered by: NewsAPI.org"
+        android:linksClickable="true"
+        android:autoLink="web"
+        android:gravity="end"
+        android:textSize="@dimen/fine_text_size"/>
+
+    <TextView
+        android:id="@+id/tvSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorSeparator"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
 
 </LinearLayout>

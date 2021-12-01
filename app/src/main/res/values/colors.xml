@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#9b0000</color>
+    <color name="colorPrimaryDark">#900000</color>
+    <color name="colorAccentLight2">#ffdab3</color>
+    <color name="colorAccent">#ff5131</color>
+    <color name="colorAccentLight">#e8eaf6</color>
+    <color name="colorText">#000000</color>
+    <color name="colorTextLight">#ffffff</color>
+    <color name="colorTextTime">#9e9e9e</color>
+    <color name="colorTextChatUserName">#616161</color>
+    <color name="colorSeparator">#d50000</color>
+    <color name="colorChatCountBubbleText">#26418f</color>
+    <color name="colorNewsRow">#ffffff</color>
+    <color name="colorMainBackground">#ffffff</color>
+    <color name="colorChatRow">#fafafa</color>
+    <color name="colorChatBackground">#fafafa</color>
+    <color name="colorTitleText">#d50000</color>
+    <color name="colorMyCommentBackground">#ffdab3</color>
+    <color name="colorOthersCommentBackground">#ffffff</color>
+
+    <!--<color name="colorPrimary">#283593</color>-->
+    <!--<color name="colorPrimaryDark">#001064</color>-->
+    <!--<color name="colorAccent">#5f5fc4</color>-->
+    <!--<color name="colorAccentLight">#e8eaf6</color>-->
+    <!--<color name="colorText">#000000</color>-->
+    <!--<color name="colorSeparator">#c5cae9</color>-->
+    <!--<color name="colorChatCountBubbleText">#26418f</color>-->
+    <!--<color name="colorNewsRow">#e0e0e0</color>-->
+    <!--<color name="colorChatRow">#e0e0e0</color>-->
+    <!--<color name="colorChatBackground">#e0e0e0</color>-->
+    <!--<color name="colorTitleText">#d50000</color>-->
+
+    <!--<color name="colorPrimary">#ff9e80</color>-->
+    <!--<color name="colorPrimaryDark">#c96f53</color>-->
+    <!--<color name="colorAccent">#ffd0b0</color>-->
+    <!--<color name="colorText">#000000</color>-->
+    <!--<color name="colorSeparator">#ffab91</color>-->
+    <!--<color name="colorChatCountBubbleText">#757575</color>-->
 </resources>
