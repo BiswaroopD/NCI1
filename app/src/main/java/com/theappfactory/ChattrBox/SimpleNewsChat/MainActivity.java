@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -35,10 +36,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.OnPaidEventListener;
 import com.google.android.gms.ads.ResponseInfo;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -58,6 +59,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -80,6 +82,7 @@ import static com.theappfactory.ChattrBox.SimpleNewsChat.PreferenceUtils.PREFERE
 import static com.theappfactory.ChattrBox.SimpleNewsChat.PreferenceUtils.PREFERENCE_KEY_SELECTED_COUNTRY;
 import static com.theappfactory.ChattrBox.SimpleNewsChat.PreferenceUtils.SHARED_PREFERENCE_FILE_NAME;
 
+
 //import android.widget.SearchView;
 //import com.crashlytics.android.Crashlytics;
 //import com.google.android.gms.ads.InterstitialAd;
@@ -88,8 +91,36 @@ public class MainActivity extends
         AppCompatActivity
         implements
         ChildEventListener,
-        SearchView.OnQueryTextListener
-{
+        SearchView.OnQueryTextListener {
+        TextToSpeech t1;
+//    TextToSpeech t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+//        @Override
+//        public void onInit(int ttsStatus) {
+//            if (ttsStatus == TextToSpeech.SUCCESS) {
+//                int ttsResult = t1.setLanguage(Locale.US);
+//                if (ttsResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+//                    Log.e("error", "This language is not supported");
+//                } else {
+//                    ConvertTextToSpeech();
+//                }
+//            } else {
+//                Log.e("error", "Initialization Failed!");
+//            }
+//        }
+//    });
+//
+//    private void ConvertTextToSpeech() {
+//        // TODO Auto-generated method stub
+////        text = et.getText().toString();
+////        if(text==null||"".equals(text))
+////        {
+//        String myText = "Content not available";
+//        Log.i("Info", "Inside ConvertTextToSpeech");
+//        Toast.makeText(this, "ConvertTextToSpeech", Toast.LENGTH_SHORT).show();
+//        t1.speak(myText, TextToSpeech.QUEUE_FLUSH, null, "myText");
+////        }else
+////            tts.speak(text+"is saved", TextToSpeech.QUEUE_FLUSH, null);
+//    }
 
     androidx.appcompat.widget.Toolbar toolbarNews;
     EditText etComment;
@@ -136,7 +167,7 @@ public class MainActivity extends
     protected void onStart() {
         super.onStart();
 //        Toast.makeText(this, "MainActivity:onStart", Toast.LENGTH_SHORT).show();
-//        Log.e("TAG", "onStart: ");
+//        Log.i("debug", "onStart: ");
 
         firebaseAuth = firebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -246,8 +277,8 @@ public class MainActivity extends
 //        Toast.makeText(this, "MainActivity:onKeyDown: ", Toast.LENGTH_SHORT).show();
 //        if(keyCode==KeyEvent.KEYCODE_BACK && intBackPressed>0) {
 
-        if(keyCode==KeyEvent.KEYCODE_BACK && ((LinearLayoutManager) newsLayoutManager)
-                .findFirstVisibleItemPosition()>0) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && ((LinearLayoutManager) newsLayoutManager)
+                .findFirstVisibleItemPosition() > 0) {
 
 //        Toast.makeText(this, ""+event.getRepeatCount(), Toast.LENGTH_SHORT).show();
 
@@ -281,7 +312,7 @@ public class MainActivity extends
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
 
 //        setTheme(R.style.AppThemeNoActionBar);
         super.onCreate(savedInstanceState);
@@ -291,6 +322,30 @@ public class MainActivity extends
 //****        This should be commented - for one-time use only - start
 //        Log.d("Instance ID", FirebaseInstanceId.getInstance().getId());
 //****        This should be commented - for one-time use only - end
+
+        //***************** Text-to-speech implementation - start **********//
+        Log.d("Debug", "Text to speech implementation test.");
+        Toast.makeText(this, "TTS", Toast.LENGTH_SHORT).show();
+//        TextToSpeech t1 = null;
+        t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int ttsStatus) {
+                if (ttsStatus == TextToSpeech.SUCCESS) {
+                    int ttsResult = t1.setLanguage(Locale.US);
+                    if (ttsResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("error", "This language is not supported");
+                    } else {
+                        t1.speak("Hello", TextToSpeech.QUEUE_FLUSH, null, "my Text");
+//                        ConvertTextToSpeech();
+                    }
+                } else {
+                    Log.e("error", "Initialization Failed!");
+                }
+            }
+        });
+
+        //***************** Text-to-speech implementation - end **********//
+
 
         ProgressBar pbNewsList = findViewById(R.id.pbNewsList);
         pbNewsList.setVisibility(View.VISIBLE);
@@ -302,9 +357,9 @@ public class MainActivity extends
 //        Toast.makeText(this, "MainActivity:onCreate", Toast.LENGTH_SHORT).show();
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolbarNews = findViewById(R.id.toolbarNews);
-            setSupportActionBar(toolbarNews);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbarNews = findViewById(R.id.toolbarNews);
+        setSupportActionBar(toolbarNews);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 //            getSupportActionBar().menu
 //            getSupportActionBar().setDisplayOptions(0);
 //            getSupportActionBar().setTitle(R.string.app_name);
@@ -390,6 +445,7 @@ public class MainActivity extends
                         chatInterstitialAdView = interstitialAd;
                         Log.i("TAG", "onAdLoaded");
                     }
+
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         // Handle the error
@@ -683,7 +739,7 @@ public class MainActivity extends
         imgViewTopBarLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, ""+stateVariables.getFirebaseUserEmail(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "" + stateVariables.getFirebaseUserEmail(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -710,10 +766,10 @@ public class MainActivity extends
 
                 //Load intersttial ad at the end of the rv scrolling
                 if ((((LinearLayoutManager) newsLayoutManager).findFirstVisibleItemPosition())
-                        == (retrievedArticleListToAdapter.size()-1)
+                        == (retrievedArticleListToAdapter.size() - 1)
                         &&
                         ((((LinearLayoutManager) newsLayoutManager).findFirstVisibleItemPosition())
-                                >18)) {
+                                > 18)) {
                     if (chatInterstitialAdView == null) {
                         Log.e("TAG", "onCreate: Interstitial Ad not loaded. ");
                     } else {
@@ -723,12 +779,12 @@ public class MainActivity extends
                 }
 
                 if ((((LinearLayoutManager) newsLayoutManager).findFirstVisibleItemPosition())
-                        == (retrievedArticleListToAdapter.size()/2)
+                        == (retrievedArticleListToAdapter.size() / 2)
                         &&
                         ((((LinearLayoutManager) newsLayoutManager).findFirstVisibleItemPosition())
-                                >4)){
+                                > 4)) {
                     if (chatInterstitialAdView != null) {
-                                Toast.makeText(MainActivity.this, "showing interstitial: " + "4" + "; " + (retrievedArticleListToAdapter.size()/2), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "showing interstitial: " + "4" + "; " + (retrievedArticleListToAdapter.size() / 2), Toast.LENGTH_SHORT).show();
                         chatInterstitialAdView.show(MainActivity.this);
                     } else {
                         Log.e("TAG", "onCreate: Interstitial Ad not loaded. ");
@@ -1001,11 +1057,11 @@ public class MainActivity extends
         super.onStop();
 
         SharedPreferences mySharedPreferences = getSharedPreferences(
-                SHARED_PREFERENCE_FILE_NAME,MODE_PRIVATE);
+                SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = mySharedPreferences.edit();
 
-        sharedPrefsEditor.putString(PREFERENCE_KEY_SELECTED_COUNTRY,strSelectedCountry);
-        sharedPrefsEditor.putInt(PREFERENCE_KEY_COMMENTID,intCommentId);
+        sharedPrefsEditor.putString(PREFERENCE_KEY_SELECTED_COUNTRY, strSelectedCountry);
+        sharedPrefsEditor.putInt(PREFERENCE_KEY_COMMENTID, intCommentId);
         sharedPrefsEditor.apply();
 
         if (sharedPrefsEditor.commit()) {
@@ -1018,7 +1074,7 @@ public class MainActivity extends
 
         //Double checking, that, the entry has been made
         SharedPreferences mySharedPreferencesRetrieve = getSharedPreferences(
-                SHARED_PREFERENCE_FILE_NAME,MODE_PRIVATE);
+                SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
 
         if (mySharedPreferencesRetrieve.contains("COUNTRY_CODE")) {
 //            Toast.makeText(this, "Current country setting stored locally!", Toast.LENGTH_SHORT).show();
@@ -1038,7 +1094,7 @@ public class MainActivity extends
         if (stateVariables.getFirebaseUserEmail() == null) {
 //          stateVariables.setFirebaseUserEmail(firebaseUser.getEmail());
             Log.e("TAG", "onPrepareOptionsMenu: User email is null.");
-        } else{
+        } else {
             Log.e("TAG", "onPrepareOptionsMenu: User email:" + stateVariables.getFirebaseUserEmail());
         }
 //        mnuActionUser.setTitle("User: " + stateVariables.getFirebaseUserEmail());
@@ -1055,7 +1111,7 @@ public class MainActivity extends
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu_main,menu);
+        inflater.inflate(R.menu.options_menu_main, menu);
 
         Log.e("TAG", "onCreateOptionsMenu: ");
 //        Toast.makeText(this, "onCreateOptionsMenu", Toast.LENGTH_SHORT).show();
@@ -1070,18 +1126,18 @@ public class MainActivity extends
 
         // Get the current version
         String versionName = "";
-        try{
+        try {
             try {
                 PackageInfo nciPackageInfo = this.getPackageManager()
-                        .getPackageInfo(getPackageName(),0);
+                        .getPackageInfo(getPackageName(), 0);
                 versionName = nciPackageInfo.versionName;
 //                Toast.makeText(this, versionName, Toast.LENGTH_SHORT).show();
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
 
-        } catch (Exception e){
-            Log.e("TAG", "onCreate: " + e.getMessage() );
+        } catch (Exception e) {
+            Log.e("TAG", "onCreate: " + e.getMessage());
         }
         MenuItem mnuActionVersion = menu.findItem(R.id.action_show_version);
         mnuActionVersion.setTitle("Version: " + versionName);
@@ -1098,17 +1154,17 @@ public class MainActivity extends
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        Log.e("TAG","Child added.");
+        Log.e("TAG", "Child added.");
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        Log.e("TAG","Child changed.");
+        Log.e("TAG", "Child changed.");
     }
 
     @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
-        Log.e("TAG","Child removed.");
+        Log.e("TAG", "Child removed.");
     }
 
     @Override
@@ -1126,23 +1182,21 @@ public class MainActivity extends
     @Override
     public boolean onQueryTextSubmit(String query) {
 
-        Log.e("TAG", "onQueryTextSubmit: " );
+        Log.e("TAG", "onQueryTextSubmit: ");
 
         return false;
     }
 
     //Search functionality
     @Override
-    public boolean onQueryTextChange(String newText)
-    {
+    public boolean onQueryTextChange(String newText) {
 
         Log.e("TAG", "onQueryTextChange: ");
 
         String searchedText = newText.toLowerCase();
         List<Article> newArticleList = new ArrayList<>();
 
-        for (Article article : currentCountryArticleListInDB )
-        {
+        for (Article article : currentCountryArticleListInDB) {
 
             try {
                 if (article.getDescription().toLowerCase().contains(searchedText) ||
@@ -1153,8 +1207,8 @@ public class MainActivity extends
 
                     newArticleList.add(article);
                 }
-            } catch (Exception e){
-                Log.e("TAG", "onQueryTextChange: " +e.getMessage() );
+            } catch (Exception e) {
+                Log.e("TAG", "onQueryTextChange: " + e.getMessage());
             }
         }
 
@@ -1228,10 +1282,10 @@ public class MainActivity extends
 //                Log.e("TAG", "onOptionsItemSelected: " + strMenuTitle + ": Signing out!");
                 break;
             case 6: //"User":
-                Log.e("TAG", "onOptionsItemSelected: "+ intMenuItemId + ".)" + strMenuTitle +" : " + stateVariables.getFirebaseUserEmail());
+                Log.e("TAG", "onOptionsItemSelected: " + intMenuItemId + ".)" + strMenuTitle + " : " + stateVariables.getFirebaseUserEmail());
 
                 item.setTitle("User: " + stateVariables.getFirebaseUserEmail());
-                Toast.makeText(this, ""+stateVariables.getFirebaseUserEmail(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "" + stateVariables.getFirebaseUserEmail(), Toast.LENGTH_SHORT).show();
         }
 
         return true;
@@ -1503,7 +1557,7 @@ public class MainActivity extends
                     @Override
                     public void onChanged(@Nullable List<Article> articleList) {
                         Log.e("TAG", "getCountryArticlesOrderByCommentedLatest().observe : onChanged: " + articleList.size());
-                        if (articleList.size()>0) {
+                        if (articleList.size() > 0) {
                             currentCountryArticleListInDB.clear();
                             currentCountryArticleListInDB.addAll(articleList);
 //                            retrievedArticleListToAdapter.clear();
@@ -1569,8 +1623,8 @@ public class MainActivity extends
                                             try {
                                                 long id = articleDAO.insertArticle(article);
                                                 Log.e("TAG", "onResponse: " + id + " " + article.getId());
-                                            } catch(Exception e) {
-                                                Log.e("TAG", "onDataChange: Error: " + e.getMessage() );
+                                            } catch (Exception e) {
+                                                Log.e("TAG", "onDataChange: Error: " + e.getMessage());
                                             }
                                         }
 
@@ -1590,7 +1644,7 @@ public class MainActivity extends
                             Log.e("TAG", "Error inserting in row: " + e.getMessage());
                         }
 
-                        if(newArticleList.size()>0) {
+                        if (newArticleList.size() > 0) {
                             articleAdapter.updateList(newArticleList);
                         }
                     }
@@ -1610,7 +1664,7 @@ public class MainActivity extends
 //                retrievedArticleListToAdapter.addAll(response.body().getArticles()); //TODO 1908
 //                articleAdapter.notifyDataSetChanged(); //TODO 1908: commenting this off to not access the db
 
-         stateVariables.setStrSelectedAriticleId("");
+        stateVariables.setStrSelectedAriticleId("");
 
         //**5. Finally, get a fresh list from the DB ie, DB(50)
         articleDAO.getCountryArticlesOrderByCommentedLatest(strSelectedCountry).observe(this, new Observer<List<Article>>() {
@@ -1618,12 +1672,12 @@ public class MainActivity extends
             public void onChanged(@Nullable List<Article> articleList) {
                 int position = 0;
                 Log.e("TAG", "getCountryArticlesOrderByCommentedLatest().observe : onChanged: " + articleList.size());
-                if (articleList.size()>0) {
+                if (articleList.size() > 0) {
                     currentCountryArticleListInDB.clear();
                     currentCountryArticleListInDB.addAll(articleList);
                     retrievedArticleListToAdapter.clear();
                     retrievedArticleListToAdapter.addAll(articleList); //TODO : 20180819:10:51
-                    for (int i=0; i<articleList.size(); i++) {
+                    for (int i = 0; i < articleList.size(); i++) {
                         if (articleList.get(i).getId().equals(stateVariables.getStrSelectedAriticleId())) {
                             position = i;
 //                            Toast.makeText(MainActivity.this, stateVariables.getStrSelectedAriticleId() + ": " + position, Toast.LENGTH_SHORT).show();
@@ -1679,9 +1733,7 @@ public class MainActivity extends
 //                                    });
 
 //                            nciFirebaseDatabaseReference.chi
-                                                //                        getNCIFirebaseCommentCount(article.getId());
-
-
+    //                        getNCIFirebaseCommentCount(article.getId());
 
 
 //        progressBarLayout.setVisibility(View.GONE);

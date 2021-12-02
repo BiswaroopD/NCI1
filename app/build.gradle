@@ -46,7 +46,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 44
-        versionName "1.0.3"
+        versionName "1.0.4"
 ////        added - start
 //            versionCode versionNumber
 //            versionName appVersionName
