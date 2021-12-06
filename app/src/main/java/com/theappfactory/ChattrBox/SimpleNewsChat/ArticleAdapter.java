@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.speech.tts.TextToSpeech;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
@@ -48,6 +50,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
     String strArticleId = "hello";
     NCIRoomDatabase nciRoomDatabase = null;
     ArticleDAO articleDAO = null;
+    TextToSpeech tts1 = null;
 
     public class ArticleViewHolder extends RecyclerView.ViewHolder {
 
@@ -112,10 +115,39 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
 
         nciRoomDatabase = NCIRoomDatabase.getDatabase(ctx);
         articleDAO = nciRoomDatabase.getArticleDAO();
-
+        StateVariables stateVariables = StateVariables.getINSTANCE();
 
         final Article currentArticle = articleList.get(i);
         Log.e("TAG", "currentArticle: " + i);
+        //Insert speaker here TODO //
+
+        tts1 = new TextToSpeech(ctx, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int ttsStatus) {
+                if (ttsStatus == TextToSpeech.SUCCESS) {
+                    int ttsResult = tts1.setLanguage(Locale.US);
+                    if (ttsResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("error", "This language is not supported");
+                    } else {
+                        //speak news
+                        Log.d("ArticleAdapter","SpeakText = " + stateVariables.getSpeakText());
+                        if (stateVariables.getSpeakText() == 1){
+                            Log.d("ArticleAdapter", "getSpeakText = " + stateVariables.getSpeakText());
+                            tts1.speak("Reading Text", TextToSpeech.QUEUE_FLUSH, null, "my Text");
+//                        tts1.speak("Article number: "+ i, TextToSpeech.QUEUE_FLUSH, null, "article number");
+                            tts1.speak(currentArticle.getTitle(),TextToSpeech.QUEUE_FLUSH,null,"articleTitle");
+//                        ConvertTextToSpeech();
+                        } else{
+                            Log.d("ArticleAdapter", "getSpeakText = " + stateVariables.getSpeakText());
+                        }
+                    }
+                } else {
+                    Log.e("error", "Initialization Failed!");
+                }
+            }
+        });
+
+
 
 //        Source bindSource = currentArticle.getSource();
         String imgURL = "";
@@ -277,7 +309,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
 
         int itemId = articleViewHolder.getAdapterPosition();
         Log.e("TAG", "itemID: " +itemId);
-        final StateVariables stateVariables = StateVariables.getINSTANCE();
+//        final StateVariables stateVariables = StateVariables.getINSTANCE();
 //        stateVariables.setStrSelectedAriticleId(currentArticle.getId());
         articleViewHolder.articleId.setText(currentArticle.getId());
 

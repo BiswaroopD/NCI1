@@ -1,6 +1,8 @@
 package com.theappfactory.ChattrBox.SimpleNewsChat;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,9 +12,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -67,6 +79,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -87,12 +101,22 @@ import static com.theappfactory.ChattrBox.SimpleNewsChat.PreferenceUtils.SHARED_
 //import com.crashlytics.android.Crashlytics;
 //import com.google.android.gms.ads.InterstitialAd;
 
-public class MainActivity extends
+public class MainActivity<mSpeechRecognizer> extends
         AppCompatActivity
         implements
+//        SensorEventListener,
         ChildEventListener,
         SearchView.OnQueryTextListener {
-        TextToSpeech t1;
+    TextToSpeech t1;
+    private SensorManager sensorManager;
+//        private SensorEventListener sensorEventListener;
+    private float acelVal, acelLast, shake;
+    //    private static int counter = 0;
+//    private SpeechRecognizer mSpeechRecognizer;
+    private final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this); //UNCOMMENT 5DEC
+    final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH); //UNCOMMENT 5DEC
+
+
 //    TextToSpeech t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
 //        @Override
 //        public void onInit(int ttsStatus) {
@@ -159,6 +183,7 @@ public class MainActivity extends
     List<Comment> retrievedCommentList = new ArrayList<>();
 
     RecyclerView.LayoutManager newsLayoutManager;
+    private static final Integer RecordAudioRequestCode = 1;
 
     //Progress circle
 //    LinearLayout progressBarLayout;
@@ -308,6 +333,7 @@ public class MainActivity extends
     @Override
     protected void onResume() {
         super.onResume();
+//        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL); UNCOMMENT 5DEC
 //        Toast.makeText(this, "MainActivity.onResume()", Toast.LENGTH_SHORT).show();
     }
 
@@ -346,6 +372,141 @@ public class MainActivity extends
 
         //***************** Text-to-speech implementation - end **********//
 
+        //**************** detecting the double shake using **************//UNCOMMENT 5DEC
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            Log.i("INFO", "Success! There's a shake sensor!!!");
+//                            Toast.makeText(this, "Success! There's a pressure sensor.", Toast.LENGTH_SHORT);
+//                            t1.speak("Success! There's a shake sensor.", TextToSpeech.QUEUE_FLUSH, null, "none");
+            sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
+            acelVal = SensorManager.GRAVITY_EARTH;
+            acelLast = SensorManager.GRAVITY_EARTH;
+            shake = 0.00f;
+
+
+        } else {
+            Log.e("INFO", "Failure! No shake sensor.");
+//                            Toast.makeText(this, "Failure! No pressure sensor.", Toast.LENGTH_SHORT);
+//                            t1.speak("Failure! No pressure sensor.", TextToSpeech.QUEUE_FLUSH, null, "none");
+        }
+
+
+        //**************** detecting the double shake using **************//
+
+        //**************** speech to text ********************************//
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            checkRecordingPermission();
+        }
+//        final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        Log.d("RecognitionListener: ", "onReadyForSpeech;))");
+        mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+                mSpeechRecognizer.startListening(speechRecognizerIntent);
+                Log.d("RecognitionListener: ", "onReadyForSpeech:)");
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+//                t1.speak("Please speak what you want.", TextToSpeech.QUEUE_FLUSH, null, "speak");
+//                new Timer().schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//                }, 5000);
+
+                Log.d("RecognitionListener: ", "onBeginningOfSpeech");
+            }
+
+            @Override
+            public void onRmsChanged(float v) {
+                Log.d("RecognitionListener: ", "onRmsChanged" + v);
+            }
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {
+                Log.d("RecognitionListener: ", "onBufferReceived");
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                Log.d("RecognitionListener: ", "onEndOfSpeech");
+                mSpeechRecognizer.stopListening();
+            }
+
+            @Override
+            public void onError(int i) {
+                Log.d("RecognitionListener: ", "onError" + i);
+
+            }
+
+            @Override
+            public void onResults(Bundle bundle) {
+                Log.d("RecognitionListener: ", "onResults");
+//                new Timer().schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        Log.d("RecognitionListener: ", "Waiting inside RecognitionListener.onResults for 5s.");
+////                        Toast.makeText(this, "Waiting inside RecognitionListener.onResults for 5s.").show();
+//                    }
+//                }, 5000);
+
+//                final Handler handler = new Handler(Looper.getMainLooper());
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.d("RecognitionListener: ", "Waiting inside Handler in RecognitionListener.onResults for 5s.");
+//                        //Do something after 100ms
+//                    }
+//                }, 2000);
+
+
+//                String n = "";
+                ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                String mSpokenText = data.get(0).trim().toLowerCase();
+                String mTalkBack = " You said: " + mSpokenText;
+//                isReadNews =
+                Log.d("RecognitionListener", mSpokenText);
+                Log.d("RecognitionListener", mTalkBack);
+                Log.d("RecognitionListener", "SpeakText = " + stateVariables.getSpeakText());
+                Log.d("RecognitionListener", "isReadNews = " + mSpokenText.equals("read news"));
+                t1.speak(mTalkBack, TextToSpeech.QUEUE_FLUSH, null, "talkback");
+
+                if (mSpokenText.equals("read news")) {
+                    t1.speak("Reading News", TextToSpeech.QUEUE_FLUSH, null, "talkback");
+                    Log.d("RecognitionListener_RN", "SpeakText = " + stateVariables.getSpeakText());
+                    stateVariables.setSpeakText(1);
+                    Log.d("RecognitionListener_RN2", "SpeakText = " + stateVariables.getSpeakText());
+                    int temp = stateVariables.getSpeakText();
+                    Log.d("RecognitionListener", mTalkBack);
+//                    Toast.makeText(this, "speakText = ", Toast.LENGTH_SHORT)).show();
+                }
+//                int iT1 = -1;
+//                int iT1 = t1.speak(mTalkBack, TextToSpeech.QUEUE_FLUSH, null, "talkback");
+//                Log.d("RecognitionListener:", "" + iT1);
+//                Toast t = Toast.makeText(this, "You said:" + data.get(0) +".", Toast.LENGTH_SHORT);
+//                t.show();
+//                .setText(data.get(0));
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+                Log.d("RecognitionListener: ", "onPartialResults");
+
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {
+                Log.d("RecognitionListener: ", "onEvent");
+
+            }
+        });
+
+        //**************** speech to text ********************************//UNCOMMENT 5DEC
 
         ProgressBar pbNewsList = findViewById(R.id.pbNewsList);
         pbNewsList.setVisibility(View.VISIBLE);
@@ -1056,6 +1217,8 @@ public class MainActivity extends
     protected void onStop() {
         super.onStop();
 
+//        sensorManager.unregisterListener(sensorEventListener); UNCOMMENT 5DEC
+//        mSpeechRecognizer.destroy();
         SharedPreferences mySharedPreferences = getSharedPreferences(
                 SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = mySharedPreferences.edit();
@@ -1084,6 +1247,12 @@ public class MainActivity extends
             Log.e("TAG", "onStop:Unable to check if Current country setting stored locally! ");
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        mSpeechRecognizer.destroy(); UNCOMMENT 5DEC
     }
 
     @Override
@@ -1740,7 +1909,7 @@ public class MainActivity extends
 //        Log.e("TAG", "getCountryArticlesFromApi: Setting progressBarLayout visibility to GONE" );
 ////////////////////////////////////////////////////////////////
 
-//    public int getNCIFirebaseCommentCount(final String articleId) {
+    //    public int getNCIFirebaseCommentCount(final String articleId) {
 //        String path = "nci-test/comments/" + articleId;
 ////        Toast.makeText(this, "getNCIFirebaseCommentCount: " + articleId, Toast.LENGTH_SHORT).show();
 //        //Variables
@@ -1820,5 +1989,74 @@ public class MainActivity extends
 //        return 1;
 //        //
 //    }
+    //*********************double shake detection***************// UNCOMMENT 5DEC
+    final SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x * x) + (y * y) + (z * z));
+            float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+//            Toast t = Toast.makeText(getApplicationContext(), "Shaken " + shake + " times!", Toast.LENGTH_LONG);
+//            t.show();
+//            Log.i("Info", "Shaken " + shake + " times!");
+
+//            if (shake > 12) {
+//                counter++;
+//            }
+
+            if (shake >= 6) {
+//                counter = 0;
+//                Toast tt = Toast.makeText(getApplicationContext(), "Dont Shake phone", Toast.LENGTH_LONG);
+//                tt.show();
+//                t1.speak("Stop shaking!!", TextToSpeech.QUEUE_FLUSH, null, "stop");
+                Log.d("Info", "Shaken " + shake + " times! Stop shaking!");
+
+                //********** Vibrating the phone on shaking *******//
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+// Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK));
+                        Log.d("Vibration:", "VibrationEffect.EFFECT_DOUBLE_CLICK");
+                    } else {
+                        v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                        Log.d("Vibration:", "VibrationEffect.DEFAULT_AMPLITUDE, 500ms");
+                    }
+                } else {
+                    //deprecated in API 26
+                    v.vibrate(500);
+                    Log.d("Vibration:", "500ms (API 26)");
+                }
+                //********** Vibrating the phone on shaking *******//
+
+                mSpeechRecognizer.startListening(speechRecognizerIntent);
+                Log.i("Info", "Started listening");
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
+
+    private void checkRecordingPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RecordAudioRequestCode && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //*********************double shake detection***************// UNCOMMENT 5DEC
 
 }
